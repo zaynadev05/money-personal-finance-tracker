@@ -1,0 +1,8 @@
+{
+  "name": "Monify Personal Finance Tracker",
+  "description": "A complete personal finance tracker with multi-wallet management, custom categories, transaction history, budgets, and automated reports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
