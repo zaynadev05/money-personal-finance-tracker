@@ -9,7 +9,18 @@ const PORT: number = Number(process.env.PORT) || 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const distPath = path.join(__dirname, 'dist');
+// Find the correct dist directory dynamically to support different runner cwd configurations
+const getDistPath = () => {
+  if (__dirname.endsWith('dist')) {
+    return __dirname;
+  }
+  if (process.cwd().endsWith('dist')) {
+    return process.cwd();
+  }
+  return path.join(process.cwd(), 'dist');
+};
+
+const distPath = getDistPath();
 
 // Serve static assets
 app.use(express.static(distPath));
