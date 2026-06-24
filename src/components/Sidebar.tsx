@@ -7,7 +7,8 @@ import {
   Settings as SettingsIcon, 
   LogOut, 
   Plus,
-  Sparkles
+  Sparkles,
+  FolderTree
 } from 'lucide-react';
 import { ActiveTab, RegisteredUser } from '../types';
 import UserAvatar from './UserAvatar';
@@ -33,6 +34,7 @@ export default function Sidebar({
     { id: 'dashboard' as ActiveTab, label: 'Dashboard', icon: LayoutDashboard },
     { id: 'transactions' as ActiveTab, label: 'Transaksi', icon: Receipt },
     { id: 'analytics' as ActiveTab, label: 'Analisis & Anggaran', icon: BarChart3 },
+    { id: 'categories_methods' as ActiveTab, label: 'Kategori & Metode', icon: FolderTree },
     { id: 'settings' as ActiveTab, label: 'Pengaturan', icon: SettingsIcon },
   ];
 

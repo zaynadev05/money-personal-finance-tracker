@@ -259,6 +259,7 @@ export default function App() {
                 { id: 'dashboard', label: 'Dasbor' },
                 { id: 'transactions', label: 'Transaksi' },
                 { id: 'analytics', label: 'Analisis & Anggaran' },
+                { id: 'categories_methods', label: 'Kategori & Pembayaran' },
                 { id: 'settings', label: 'Pengaturan' },
               ] as { id: ActiveTab; label: string }[]).map((m) => (
                 <button
@@ -321,12 +322,23 @@ export default function App() {
             />
           )}
 
+          {activeTab === 'categories_methods' && (
+            <SettingsView 
+              currentUser={sessionUser} 
+              onProfileUpdate={(updated) => setSessionUser(updated)}
+              onAccountDeleted={() => setSessionUser(null)}
+              showToast={triggerToast} 
+              mode="categories_methods"
+            />
+          )}
+
           {activeTab === 'settings' && (
             <SettingsView 
               currentUser={sessionUser} 
               onProfileUpdate={(updated) => setSessionUser(updated)}
               onAccountDeleted={() => setSessionUser(null)}
               showToast={triggerToast} 
+              mode="profile"
             />
           )}
         </main>

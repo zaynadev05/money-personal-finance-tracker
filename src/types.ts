@@ -60,4 +60,4 @@ export interface UserSession {
   isAuthenticated: boolean;
 }
 
-export type ActiveTab = 'dashboard' | 'transactions' | 'wallets' | 'analytics' | 'settings';
+export type ActiveTab = 'dashboard' | 'transactions' | 'wallets' | 'analytics' | 'settings' | 'categories_methods';

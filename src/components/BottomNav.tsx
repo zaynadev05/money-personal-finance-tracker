@@ -5,7 +5,8 @@ import {
   BarChart3, 
   Settings as SettingsIcon, 
   Plus,
-  Sparkles
+  Sparkles,
+  FolderTree
 } from 'lucide-react';
 import { ActiveTab } from '../types';
 
@@ -64,6 +65,17 @@ export default function BottomNav({
       >
         <BarChart3 className={`w-5 h-5 mb-0.5 transition-transform duration-300 ${activeTab === 'analytics' ? 'text-[#D3A474] scale-110' : 'text-[#1E3C2B]/60'}`} />
         <span>Analisis</span>
+      </button>
+
+      <button
+        id="bottom-nav-categories"
+        onClick={() => setActiveTab('categories_methods')}
+        className={`flex flex-col items-center justify-center flex-1 h-full py-1 text-[10px] transition-all cursor-pointer ${
+          activeTab === 'categories_methods' ? 'text-[#D3A474] font-bold' : 'text-[#1E3C2B]/60 font-medium'
+        }`}
+      >
+        <FolderTree className={`w-5 h-5 mb-0.5 transition-transform duration-300 ${activeTab === 'categories_methods' ? 'text-[#D3A474] scale-110' : 'text-[#1E3C2B]/60'}`} />
+        <span>Kategori</span>
       </button>
 
       <button

@@ -29,6 +29,7 @@ interface SettingsViewProps {
   onProfileUpdate: (updatedUser: RegisteredUser) => void;
   onAccountDeleted: () => void;
   showToast: (msg: string, type: 'success' | 'error') => void;
+  mode?: 'profile' | 'categories_methods';
 }
 
 type SubTab = 'profile' | 'categories' | 'payment_methods';
@@ -48,8 +49,13 @@ export default function SettingsView({
   onProfileUpdate,
   onAccountDeleted,
   showToast,
+  mode = 'profile',
 }: SettingsViewProps) {
-  const [subTab, setSubTab] = useState<SubTab>('profile');
+  const [subTab, setSubTab] = useState<SubTab>(mode === 'profile' ? 'profile' : 'categories');
+
+  useEffect(() => {
+    setSubTab(mode === 'profile' ? 'profile' : 'categories');
+  }, [mode]);
 
   // Sub Tab 1: Profile forms
   const [fullName, setFullName] = useState(currentUser.fullName);
@@ -411,44 +417,42 @@ export default function SettingsView({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2 mt-4">
         <div>
           <h2 className="text-2xl font-fredoka font-semibold text-[#1E3C2B] tracking-tight flex items-center gap-2">
-            ⚙️ Pengaturan Aplikasi
+            {mode === 'profile' ? '⚙️ Pengaturan Profil' : '📁 Kategori & Pembayaran'}
           </h2>
-          <p className="text-xs text-[#1E3C2B]/85 font-semibold">Ubah info akun personal, avatar, dan kustomisasi kategori pengeluaran harianmu.</p>
+          <p className="text-xs text-[#1E3C2B]/85 font-semibold">
+            {mode === 'profile' 
+              ? 'Ubah info akun personal, avatar, dan kustomisasi keamanan akunmu.' 
+              : 'Atur daftar kategori mutasi serta opsi metode pembayaran personal pilihanmu.'}
+          </p>
         </div>
 
         {/* Sub Navigation tabs */}
-        <div className="flex bg-[#1E3C2B] p-1.5 rounded-2xl gap-0.5 border border-[#D3A474]/30 self-start sm:self-auto select-none">
-          <button
-            onClick={() => setSubTab('profile')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold leading-none cursor-pointer transition-all ${
-              subTab === 'profile'
-                ? 'bg-[#D3A474] text-white shadow-xs'
-                : 'text-[#FAF7F2]/65 hover:text-white bg-transparent'
-            }`}
-          >
-            Saku Profil
-          </button>
-          <button
-            onClick={() => setSubTab('categories')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold leading-none cursor-pointer transition-all ${
-              subTab === 'categories'
-                ? 'bg-[#D3A474] text-white shadow-xs'
-                : 'text-[#FAF7F2]/65 hover:text-white bg-transparent'
-            }`}
-          >
-            Koleksi Kategori
-          </button>
-          <button
-            onClick={() => setSubTab('payment_methods')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold leading-none cursor-pointer transition-all ${
-              subTab === 'payment_methods'
-                ? 'bg-[#D3A474] text-white shadow-xs'
-                : 'text-[#FAF7F2]/65 hover:text-white bg-transparent'
-            }`}
-          >
-            Metode Pembayaran
-          </button>
-        </div>
+        {mode === 'categories_methods' && (
+          <div className="flex bg-[#1E3C2B] p-1.5 rounded-2xl gap-0.5 border border-[#D3A474]/30 self-start sm:self-auto select-none">
+            <button
+              id="settings-tab-categories"
+              onClick={() => setSubTab('categories')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold leading-none cursor-pointer transition-all ${
+                subTab === 'categories'
+                  ? 'bg-[#D3A474] text-white shadow-xs'
+                  : 'text-[#FAF7F2]/65 hover:text-white bg-transparent'
+              }`}
+            >
+              Koleksi Kategori
+            </button>
+            <button
+              id="settings-tab-payments"
+              onClick={() => setSubTab('payment_methods')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold leading-none cursor-pointer transition-all ${
+                subTab === 'payment_methods'
+                  ? 'bg-[#D3A474] text-white shadow-xs'
+                  : 'text-[#FAF7F2]/65 hover:text-white bg-transparent'
+              }`}
+            >
+              Metode Pembayaran
+            </button>
+          </div>
+        )}
       </div>
 
       {/* SUB TAB 1: PROFILE MANAGEMENT */}
