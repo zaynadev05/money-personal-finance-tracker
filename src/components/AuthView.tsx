@@ -48,7 +48,11 @@ export default function AuthView({ onAuthSuccess, showToast }: AuthViewProps) {
       showToast(`Selamat datang kembali, ${user.fullName}!`, 'success');
       onAuthSuccess(user);
     } catch (err: any) {
-      showToast(err.message || 'Login gagal.', 'error');
+      let errMsg = err.message || 'Login gagal.';
+      if (errMsg.toLowerCase().includes('invalid login credentials')) {
+        errMsg = 'Kredensial login salah. Jika Anda baru mendaftar, pastikan opsi "Confirm email" di Supabase Dashboard -> Authentication -> Providers -> Email sudah MATI (nonaktif) agar pendaftaran langsung aktif otomatis tanpa perlu verifikasi email.';
+      }
+      showToast(errMsg, 'error');
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +75,11 @@ export default function AuthView({ onAuthSuccess, showToast }: AuthViewProps) {
       setMode('login');
       setPassword(''); // Reset password field
     } catch (err: any) {
-      showToast(err.message || 'Registrasi gagal.', 'error');
+      let errMsg = err.message || 'Registrasi gagal.';
+      if (errMsg.toLowerCase().includes('rate limit')) {
+        errMsg = 'Batas pengiriman email Supabase terlampaui (rate limit). Solusi: Silakan masuk ke Supabase Dashboard -> Authentication -> Providers -> Email, lalu nonaktifkan pilihan "Confirm email" agar pendaftaran langsung aktif otomatis tanpa mengirim email verifikasi.';
+      }
+      showToast(errMsg, 'error');
     } finally {
       setIsLoading(false);
     }
