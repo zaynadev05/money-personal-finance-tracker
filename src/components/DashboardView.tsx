@@ -338,10 +338,29 @@ export default function DashboardView({
               <span className="text-sm font-bold font-fredoka text-white leading-normal mt-0.5">
                 {protectValue(totalBalance)}
               </span>
-              {currentUser.initialBalance !== undefined && currentUser.initialBalance !== null && (
-                <span className="text-[9px] font-medium text-[#FAF7F2] mt-0.5 leading-none">
-                  Saldo Awal: <span className="font-bold text-[#FFFFFF]">{protectValue(currentUser.initialBalance)}</span>
-                </span>
+              {currentUser.initialBalance !== undefined && currentUser.initialBalance !== null ? (
+                <button 
+                  onClick={() => {
+                    setEnteredBal(String(currentUser.initialBalance || 0));
+                    setIsInitialBalOpen(true);
+                  }}
+                  className="text-[9px] font-medium text-[#FAF7F2] hover:text-[#D3A474] transition-all mt-0.5 leading-none flex items-center gap-1 cursor-pointer bg-transparent border-none p-0 text-left"
+                  title="Ubah Saldo Awal"
+                >
+                  <span>Saldo Awal:</span>
+                  <span className="font-bold text-[#FFFFFF] underline decoration-dotted decoration-[#D3A474]">{protectValue(currentUser.initialBalance)}</span>
+                  <span className="text-[8px] text-[#D3A474]">✏️</span>
+                </button>
+              ) : (
+                <button 
+                  onClick={() => {
+                    setEnteredBal('');
+                    setIsInitialBalOpen(true);
+                  }}
+                  className="text-[9px] font-bold text-[#D3A474] hover:underline leading-none mt-1 text-left cursor-pointer bg-transparent border-none p-0"
+                >
+                  + Atur Saldo Awal
+                </button>
               )}
             </div>
           </div>
@@ -447,6 +466,21 @@ export default function DashboardView({
               <span className="text-xl">📊</span>
             </div>
             <span className="text-[10px] font-semibold text-[#FAF7F2] group-hover:text-[#D3A474] transition-colors">Lihat Laporan</span>
+          </button>
+
+          {/* Atur/Ubah Saldo Awal / Uang Bulanan */}
+          <button 
+            id="quick-set-initial-balance"
+            onClick={() => {
+              setEnteredBal(currentUser.initialBalance ? String(currentUser.initialBalance) : '');
+              setIsInitialBalOpen(true);
+            }}
+            className="flex flex-col items-center gap-1.5 group cursor-pointer"
+          >
+            <div className="w-11 h-11 rounded-1.5xl bg-[#D3A474]/20 hover:bg-[#D3A474]/30 text-[#D3A474] font-bold flex items-center justify-center shadow-xs transition-all duration-300 transform group-hover:scale-105 active:scale-95">
+              <span className="text-lg">💰</span>
+            </div>
+            <span className="text-[10px] font-semibold text-[#FAF7F2] group-hover:text-[#D3A474] transition-colors">Uang Bulanan</span>
           </button>
         </div>
       </section>
@@ -665,17 +699,17 @@ export default function DashboardView({
               
               <div className="flex flex-col gap-2">
                 <h3 className="font-fredoka font-semibold text-xl text-white">
-                  Setup Saldo Awal Saya
+                  {currentUser.initialBalance !== undefined && currentUser.initialBalance !== null ? 'Ubah Saldo Awal / Uang Bulanan' : 'Setup Saldo Awal Saya'}
                 </h3>
                 <p className="text-xs text-[#FAF7F2] font-medium leading-relaxed max-w-sm">
-                  Masukkan jumlah uang yang Anda miliki saat ini sebagai langkah awal memulai pencatatan keuangan pribadi di Monify.
+                  Masukkan jumlah uang bulanan atau saldo awal yang Anda miliki saat ini sebagai dasar pencatatan keuangan pribadi di Monify.
                 </p>
               </div>
 
               <form onSubmit={handleSaveInitialBalance} className="w-full flex flex-col gap-4">
                 <div className="flex flex-col gap-1 w-full text-left">
                   <label className="text-[10px] font-bold text-[#FAF7F2] uppercase pl-1 tracking-wider">
-                    Saldo Awal Saya
+                    Nominal Saldo / Uang Bulanan
                   </label>
                   <div className="relative flex items-center">
                     <span className="absolute left-4 text-xs font-bold text-[#1E3C2B]">
@@ -704,10 +738,22 @@ export default function DashboardView({
                     disabled={isSavingBal || !enteredBal}
                     className="w-full bg-[#D3A474] hover:bg-[#c39363] hover:scale-[1.01] text-white text-xs font-bold py-3.5 rounded-2xl shadow-md transition-all cursor-pointer inline-flex items-center justify-center gap-1.5"
                   >
-                    <span>{isSavingBal ? 'Menyimpan...' : 'Simpan Saldo Awal'}</span>
+                    <span>{isSavingBal ? 'Menyimpan...' : 'Simpan Perubahan'}</span>
                   </button>
+                  
+                  {(currentUser.initialBalance !== undefined && currentUser.initialBalance !== null) && (
+                    <button
+                      id="btn-cancel-initial-balance"
+                      type="button"
+                      onClick={() => setIsInitialBalOpen(false)}
+                      className="w-full bg-white/10 hover:bg-white/20 text-white text-xs font-bold py-3.5 rounded-2xl transition-all cursor-pointer inline-flex items-center justify-center border border-white/20"
+                    >
+                      Batal
+                    </button>
+                  )}
+                  
                   <p className="text-[10px] text-[#FAF7F2] font-medium leading-relaxed">
-                    Saldo Awal ini bukan merupakan rekening/wallet, melainkan saldo dasar untuk perhitungan keuangan personal Anda.
+                    Uang Bulanan / Saldo Awal ini digunakan sebagai saldo dasar untuk seluruh kalkulasi pencatatan mutasi harian Anda.
                   </p>
                 </div>
               </form>
