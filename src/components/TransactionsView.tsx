@@ -112,6 +112,8 @@ export default function TransactionsView({
   const [txPaymentMethodId, setTxPaymentMethodId] = useState('');
   const [txNotes, setTxNotes] = useState('');
   const [txDate, setTxDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [customCategoryName, setCustomCategoryName] = useState('');
+  const [customCategoryIcon, setCustomCategoryIcon] = useState('✨');
 
   // Month & Year filter for PDF Report
   const [reportMonth, setReportMonth] = useState<number>(() => new Date().getMonth() + 1);
@@ -355,6 +357,8 @@ export default function TransactionsView({
     setTxAmount('');
     setTxNotes('');
     setTxDate(new Date().toISOString().split('T')[0]);
+    setCustomCategoryName('');
+    setCustomCategoryIcon('✨');
     
     if (paymentMethods.length > 0) {
       setTxPaymentMethodId(paymentMethods[0].id);
@@ -386,11 +390,15 @@ export default function TransactionsView({
     setTxPaymentMethodId(t.paymentMethodId || (paymentMethods[0]?.id || ''));
     setTxNotes(t.notes);
     setTxDate(t.date.split('T')[0]);
+    setCustomCategoryName('');
+    setCustomCategoryIcon('✨');
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setCustomCategoryName('');
+    setCustomCategoryIcon('✨');
     if (onAddModalCloseComplete) onAddModalCloseComplete();
   };
 
@@ -398,7 +406,31 @@ export default function TransactionsView({
   const handleSaveTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const isCategoryEmpty = txType !== 'transfer' && !txCategoryId;
+    let finalCategoryId = txCategoryId;
+
+    if (txType !== 'transfer' && txCategoryId === 'other_custom') {
+      if (!customCategoryName.trim()) {
+        showToast('Nama kategori baru tidak boleh kosong.', 'error');
+        return;
+      }
+
+      try {
+        const newCat = await CategoryDB.addCategory(
+          currentUser.id,
+          customCategoryName.trim(),
+          txType === 'pemasukan' ? 'pemasukan' : 'pengeluaran',
+          customCategoryIcon,
+          '#D3A474'
+        );
+        finalCategoryId = newCat.id;
+        showToast(`Kategori "${newCat.name}" berhasil dibuat!`, 'success');
+      } catch (err: any) {
+        showToast(err.message || 'Gagal membuat kategori baru.', 'error');
+        return;
+      }
+    }
+
+    const isCategoryEmpty = txType !== 'transfer' && !finalCategoryId;
     if (!txAmount || Number(txAmount) <= 0 || isCategoryEmpty || !txDate || txDate.trim() === '') {
       showToast('Data transaksi belum lengkap.', 'error');
       return;
@@ -416,7 +448,7 @@ export default function TransactionsView({
           currentUser.id,
           targetWalletId,
           undefined,
-          txCategoryId ? txCategoryId : undefined,
+          finalCategoryId ? finalCategoryId : undefined,
           txType,
           Number(txAmount),
           txNotes,
@@ -428,7 +460,7 @@ export default function TransactionsView({
         await TransactionDB.updateTransaction(currentUser.id, selectedTransId, {
           walletId: targetWalletId,
           toWalletId: undefined,
-          categoryId: txCategoryId ? txCategoryId : undefined,
+          categoryId: finalCategoryId ? finalCategoryId : undefined,
           paymentMethodId: txPaymentMethodId || undefined,
           type: txType,
           amount: Number(txAmount),
@@ -964,19 +996,67 @@ export default function TransactionsView({
                 <select
                   id="modal-tx-category"
                   value={txCategoryId}
-                  onChange={(e) => setTxCategoryId(e.target.value)}
-                  className="w-full bg-[#F7F1EA] border border-[#D3A474] rounded-2xl px-3 py-2.5 text-xs text-[#1E3C2B] font-bold focus:outline-none"
+                  onChange={(e) => {
+                    setTxCategoryId(e.target.value);
+                    if (e.target.value !== 'other_custom') {
+                      setCustomCategoryName('');
+                    }
+                  }}
+                  className="w-full bg-[#F7F1EA] border border-[#D3A474] rounded-2xl px-3 py-2.5 text-xs text-[#1E3C2B] font-bold focus:outline-none cursor-pointer"
                 >
                   {categories.filter(c => c.type === txType).map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
                     </option>
                   ))}
-                  {categories.filter(c => c.type === txType).length === 0 && (
-                    <option value="">Belum ada kategori</option>
-                  )}
+                  <option value="other_custom">➕ Kategori Lainnya (Tulis Sendiri)</option>
                 </select>
               </div>
+
+              {/* Custom Category Input (shown only if 'other_custom' is selected) */}
+              {txCategoryId === 'other_custom' && (
+                <div className="flex flex-col gap-1.5 p-3.5 bg-[#FAF7F2]/5 rounded-2xl border border-[#D3A474]/30 animate-slide-up text-left">
+                  <div className="flex gap-2">
+                    <div className="flex flex-col gap-1 flex-1">
+                      <label className="text-[9px] font-bold text-[#D3A474] uppercase pl-1 tracking-wider">Nama Kategori Baru</label>
+                      <input
+                        id="modal-tx-custom-category-name"
+                        type="text"
+                        required
+                        placeholder="Contoh: Belanja Bulanan, Donasi, dll"
+                        value={customCategoryName}
+                        onChange={(e) => setCustomCategoryName(e.target.value)}
+                        className="w-full bg-[#F7F1EA] border border-[#D3A474] rounded-xl px-3 py-2 text-xs text-[#1E3C2B] font-bold focus:outline-none"
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col gap-1 w-24">
+                      <label className="text-[9px] font-bold text-[#D3A474] uppercase pl-1 tracking-wider text-center">Ikon</label>
+                      <select
+                        value={customCategoryIcon}
+                        onChange={(e) => setCustomCategoryIcon(e.target.value)}
+                        className="w-full bg-[#F7F1EA] border border-[#D3A474] rounded-xl px-2 py-2 text-xs text-[#1E3C2B] font-bold focus:outline-none text-center cursor-pointer"
+                      >
+                        <option value="✨">✨ Kilau</option>
+                        <option value="🛍️">🛍️ Belanja</option>
+                        <option value="🍔">🍔 Makan</option>
+                        <option value="🚗">🚗 Transport</option>
+                        <option value="🎁">🎁 Kado</option>
+                        <option value="🐱">🐱 Hewan</option>
+                        <option value="🩺">🩺 Medis</option>
+                        <option value="💡">💡 Listrik</option>
+                        <option value="🎮">🎮 Game</option>
+                        <option value="📚">📚 Belajar</option>
+                        <option value="💼">💼 Kerja</option>
+                        <option value="📁">📁 Lainnya</option>
+                      </select>
+                    </div>
+                  </div>
+                  <p className="text-[9px] text-[#FAF7F2]/70 leading-relaxed pl-1 mt-0.5">
+                    Kategori baru ini akan disimpan secara otomatis ke dalam daftar kategori Anda setelah transaksi dicatat.
+                  </p>
+                </div>
+              )}
 
               {/* Payment Method selector */}
               <div className="flex flex-col gap-1">

@@ -99,17 +99,7 @@ export default function Sidebar({
         })}
       </nav>
 
-      {/* Quick Action Button */}
-      <div className="px-4 py-3">
-        <button
-          id="sidebar-quick-add"
-          onClick={() => onOpenAddTransaction()}
-          className="w-full bg-[#D3A474] hover:bg-[#c39363] active:scale-[0.98] text-white py-3.5 rounded-2xl text-sm font-semibold shadow-sm shadow-[#D3A474]/20 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
-        >
-          <Plus className="w-4 h-4 text-white stroke-[2.5]" />
-          <span>Tambah Transaksi</span>
-        </button>
-      </div>
+
 
       {/* Modern User Profile & Logout - Earthy Theme */}
       <div className="p-4 border-t border-[#D3A474]/20">
