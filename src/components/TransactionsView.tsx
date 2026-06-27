@@ -329,10 +329,8 @@ export default function TransactionsView({
         setTxToWalletId('');
       }
 
-      if (categories.length > 0) {
-        const match = categories.find(c => c.type === type);
-        setTxCategoryId(match ? match.id : (categories[0]?.id || ''));
-      }
+      const match = categories.find(c => c.type === type);
+      setTxCategoryId(match ? match.id : 'other_custom');
     }
     setIsModalOpen(isAddModalOpenInitially);
   }, [isAddModalOpenInitially, initialType, categories, wallets, paymentMethods]);
@@ -343,10 +341,8 @@ export default function TransactionsView({
     if (wallets.length > 0) {
       if (!txWalletId) setTxWalletId(wallets[0].id);
     }
-    if (categories.length > 0) {
-      const match = categories.find(c => c.type === type) || categories[0];
-      setTxCategoryId(match ? match.id : '');
-    }
+    const match = categories.find(c => c.type === type);
+    setTxCategoryId(match ? match.id : 'other_custom');
   };
 
   // Open Modal Helpers
@@ -375,7 +371,7 @@ export default function TransactionsView({
     }
 
     const firstExp = categories.find(c => c.type === 'pengeluaran');
-    setTxCategoryId(firstExp ? firstExp.id : (categories[0]?.id || ''));
+    setTxCategoryId(firstExp ? firstExp.id : 'other_custom');
     setIsModalOpen(true);
   };
 
@@ -1004,6 +1000,7 @@ export default function TransactionsView({
                   }}
                   className="w-full bg-[#F7F1EA] border border-[#D3A474] rounded-2xl px-3 py-2.5 text-xs text-[#1E3C2B] font-bold focus:outline-none cursor-pointer"
                 >
+                  <option value="">-- Pilih Kategori --</option>
                   {categories.filter(c => c.type === txType).map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
